@@ -11,8 +11,28 @@ const userUpdateValidationSchema = z.object({
     .string()
     .min(2, "User name must be at least 2 characters long")
     .optional(),
-  phone: z.string().min(10, "Mobile Number at least 10 Digit long").optional(),
-  address: z.string().min(4, "Mobile Number at least 10 Digit long").optional(),
+  phone: z
+    .string()
+    .min(8, "Mobile Number must be at least 8 digits long")
+    .optional(),
+  address: z
+    .string()
+    .min(4, "Address must be at least 4 characters long")
+    .optional(),
+  specialization: z
+    .array(z.string().min(1, "Specialization cannot be empty"))
+    .optional(),
+  experienceYears: z
+    .number()
+    .int("Experience must be an integer")
+    .min(0, "Experience must be non-negative")
+    .optional(),
+  licenseNumber: z.string().min(1, "License number is required").optional(),
+  barAssociation: z.string().min(1, "Bar association is required").optional(),
+  consultationFee: z
+    .number()
+    .min(0, "Consultation fee must be non-negative")
+    .optional(),
 });
 
 export const userValidation = {
