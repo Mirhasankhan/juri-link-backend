@@ -16,6 +16,7 @@ model User {
   profileImage     String?
   phone            String?
   address          String?
+  isApproved       Boolean         @default(false)
   role             UserRole        @default(USER)
   createdAt        DateTime        @default(now())
   updatedAt        DateTime        @updatedAt
@@ -40,8 +41,10 @@ model LawyerDetails {
   userId          String   @db.ObjectId
   specialization  String[]
   experienceYears Int
-  licenseNumber   String
-  barAssociation  String
+  licenseNumber   String?
+  barAssociation  String?
+  lawDegreeUrl    String?
+  nationalIDUrl   String?
   consultationFee Float
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
