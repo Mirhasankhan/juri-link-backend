@@ -38,14 +38,14 @@ model Otp {
 
 model LawyerDetails {
   id              String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId          String   @db.ObjectId
+  userId          String  @unique @db.ObjectId
   specialization  String[]
-  experienceYears Int
+  experienceYears Int?
   licenseNumber   String?
   barAssociation  String?
   lawDegreeUrl    String?
   nationalIDUrl   String?
-  consultationFee Float
+  consultationFee Float?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 

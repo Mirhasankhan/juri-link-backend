@@ -10,9 +10,9 @@ const handleUpdateDetailsIntoDB = async (
   });
 
   const details = await prisma.lawyerDetails.upsert({
-    where: { id },
-    update: { ...payload },
-    create: { ...payload },
+    where: { userId:id },
+    update: { ...payload, userId:id },
+    create: { ...payload , userId:id},
   });
   return details;
 };
