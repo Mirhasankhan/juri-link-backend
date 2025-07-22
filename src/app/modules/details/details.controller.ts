@@ -4,8 +4,7 @@ import { detailsServices } from "./details.service";
 
 const updateDetails = catchAsync(async (req, res) => {
   const result = await detailsServices.handleUpdateDetailsIntoDB(
-    req.user.id,
-    req.body
+    req
   );
 
   sendResponse(res, {
