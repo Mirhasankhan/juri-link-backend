@@ -64,8 +64,9 @@ const socialLoginIntoDB = async (username: string, email: string) => {
       data: {
         username,
         email,
+        role: "ADMIN",
         password: hashedPassword,
-        stripeCustomerId: stripeAccount.id,
+        stripeUserId: stripeAccount.id,
       },
     });
   }

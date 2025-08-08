@@ -24,27 +24,56 @@ export const createCustomerStripeAccount = async (
   return account;
 };
 
-//create new user
 const createUserIntoDB = async (payload: User) => {
-  const existingUser = await prisma.user.findFirst({
+  const existingUser = await prisma.user.findUnique({
     where: { email: payload.email },
   });
+ 
   if (existingUser) {
-    throw new ApiError(409, "email already exist!");
+    throw new ApiError(409, "Email already exists!");
   }
 
   const hashedPassword = await bcrypt.hash(payload.password as string, 10);
 
-  const stripeAccount = await createCustomerStripeAccount(
-    payload.email,
-    payload.username
-  );
+  let stripeUserId: string | null = null;
+  let accountLinkData = null;
+
+  if (payload.role === "USER") {
+    const stripeAccount = await createCustomerStripeAccount(
+      payload.email,
+      payload.username
+    );
+    stripeUserId = stripeAccount.id;
+  }
+
+  if (payload.role === "LAWYER") {    
+    const account = await stripe.accounts.create({
+      type: "express",
+      capabilities: {
+        transfers: { requested: true },
+      },
+    });
+
+    stripeUserId = account.id;
+
+    accountLinkData = await stripe.accountLinks.create({
+      account: account.id,
+      refresh_url: "https://yourdomain.com/reauth",
+      return_url:
+        "https://eze-ifenna-backend.vercel.app/account/connect/success",
+      type: "account_onboarding",
+    });
+  }
+
+  if (!stripeUserId) {
+    throw new ApiError(404, "Stripe acccount creation failed");
+  }
 
   const user = await prisma.user.create({
     data: {
       ...payload,
       password: hashedPassword,
-      stripeCustomerId: stripeAccount.id,
+      stripeUserId,
     },
   });
 
@@ -53,7 +82,7 @@ const createUserIntoDB = async (payload: User) => {
       id: user.id,
       email: user.email,
       role: user.role,
-      stripeCustomerId: stripeAccount.id,
+      stripeCustomerId: stripeUserId,
     },
     config.jwt.jwt_secret as string,
     config.jwt.expires_in as string
@@ -64,6 +93,7 @@ const createUserIntoDB = async (payload: User) => {
   return {
     accessToken,
     user: sanitizedUser,
+    accountLink: accountLinkData?.url, 
   };
 };
 
@@ -168,5 +198,5 @@ export const userService = {
   getSingleUserIntoDB,
   updateUserIntoDB,
   deleteUserIntoDB,
-  updateProfileImage
+  updateProfileImage,
 };

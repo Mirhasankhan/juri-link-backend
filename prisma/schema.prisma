@@ -8,19 +8,23 @@ generator client {
 }
 
 model User {
-  id               String          @id @default(auto()) @map("_id") @db.ObjectId
-  username         String
-  email            String          @unique
-  password         String
-  stripeCustomerId String
-  profileImage     String?
-  phone            String?
-  address          String?
-  isApproved       Boolean         @default(false)
-  role             UserRole        @default(USER)
-  createdAt        DateTime        @default(now())
-  updatedAt        DateTime        @updatedAt
-  LawyerDetails    LawyerDetails[]
+  id             String       @id @default(auto()) @map("_id") @db.ObjectId
+  username       String
+  email          String       @unique
+  password       String
+  stripeUserId   String
+  profileImage   String?
+  phone          String?
+  address        String?
+  licenceUrl     String?
+  barAssociation String?
+  licenceNumber  String?
+  experience     Int?
+  serviceType    TServiceType?
+  specialization String[]
+  role           UserRole
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
 
   @@map("users")
 }
@@ -36,26 +40,26 @@ model Otp {
   @@map("otps")
 }
 
-model LawyerDetails {
-  id              String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId          String  @unique @db.ObjectId
-  specialization  String[]
-  experienceYears Int?
-  licenseNumber   String?
-  barAssociation  String?
-  lawDegreeUrl    String?
-  nationalIDUrl   String?
-  consultationFee Float?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+model LegalService {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  serviceName String   @unique
+  overview    String
+  features    String[]
+  serviceIcon String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  user User @relation(fields: [userId], references: [id])
-
-  @@map("lawyerDetails")
+  @@map("legalServices")
 }
 
 enum UserRole {
   ADMIN
   USER
   LAWYER
+}
+
+enum TServiceType {
+  Online
+  In_Person
+  Both
 }
